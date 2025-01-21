@@ -1,3 +1,6 @@
+let computerScore = 0;
+let humanScore = 0;
+
 function getComputerChoice() {
     const randomInt = Math.floor(Math.random() * 3);
     if (randomInt === 0) {
@@ -11,48 +14,38 @@ function getComputerChoice() {
     }
 }
 
-function getHumanChoice() {
-    const userInput = prompt("Enter your choice below!");
-    const choice = userInput.toLowerCase();
-    if (choice != "rock" && choice != "paper" && choice != "scissors") {
-        getHumanChoice();
-    }
-    else {return choice;}
-}
-
-function playGame() {
-    let computerScore = 0;
-    let humanScore = 0;
+function playRound(humanChoice, computerChoice) {
+    const outcomes = {
+        rock: { scissors: "win", paper: "lose", rock: "tie" },
+        paper: { rock: "win", scissors: "lose", paper: "tie" },
+        scissors: { paper: "win", rock: "lose", scissors: "tie" }
+    };
     
-    function playRound(humanChoice, computerChoice) {
-        const outcomes = {
-            rock: { scissors: "win", paper: "lose", rock: "tie" },
-            paper: { rock: "win", scissors: "lose", paper: "tie" },
-            scissors: { paper: "win", rock: "lose", scissors: "tie" }
-        };
-        
-        const result = outcomes[humanChoice][computerChoice];
-        
-        if (result === "win") {
-            ++humanScore;
-            console.log(`You win! ${humanChoice.charAt(0).toUpperCase() + humanChoice.slice(1)} beats ${computerChoice}.`);
-        } else if (result === "lose") {
-            ++computerScore;
-            console.log(`You lose! ${computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1)} beats ${humanChoice}.`);
-        } else {
-            console.log("Tie!");
-        }
-    }
-
-    for (let i = 0; i < 5; ++i) {
-        const humanSelection = getHumanChoice();
-        const computerSelection = getComputerChoice();
-        
-        playRound(humanSelection, computerSelection);
-    }
-
-    if (computerScore > humanScore) {console.log("You lost! Try again!")}
-    else {console.log("You win! Great job!")}
+    const result = outcomes[humanChoice][computerChoice];
+    return result;
 }
 
-playGame();
+// buttons is a node list. It looks and acts much like an array.
+const buttons = document.querySelectorAll("button");
+
+// we use the .forEach method to iterate through each button
+buttons.forEach((button) => {
+  // and for each one we add a 'click' listener
+  button.addEventListener("click", () => {
+    const result = playRound(button.id, getComputerChoice());
+    if (result === "win") {
+        humanScore++;
+    } else if (result === "lose") {
+        computerScore++;
+    }
+    updateScoreboard();
+  });
+});
+
+function updateScoreboard() {
+    const resultContainer = document.querySelector(".result");
+    resultContainer.textContent = `You: ${humanScore} | Computer: ${computerScore}`;
+    
+}
+
+updateScoreboard();
